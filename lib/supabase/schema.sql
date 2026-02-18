@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS products (
   stock_status VARCHAR(20) CHECK (stock_status IN ('in_stock', 'out_of_stock', 'low_stock')) DEFAULT 'in_stock',
   supplier_id UUID REFERENCES suppliers(id),
   image_url TEXT,
+  image_urls JSONB DEFAULT '[]'::jsonb,
   description TEXT,
   featured BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -83,7 +84,20 @@ CREATE TABLE IF NOT EXISTS car_models (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 7. AI Conversations table (no foreign keys)
+-- 7. Visitor Analytics table (no foreign keys)
+CREATE TABLE IF NOT EXISTS visits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  page_url TEXT NOT NULL,
+  user_agent TEXT,
+  ip_address TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_visits_visited_at ON visits(visited_at DESC);
+CREATE INDEX IF NOT EXISTS idx_visits_page_url ON visits(page_url);
+ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
+
+-- 8. AI Conversations table (no foreign keys)
 CREATE TABLE IF NOT EXISTS ai_conversations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   customer_phone VARCHAR(20) NOT NULL,
@@ -141,7 +155,20 @@ CREATE POLICY "Admin can delete faqs" ON faqs FOR DELETE USING (true);
 CREATE POLICY "Admin can update orders" ON orders FOR UPDATE USING (true);
 CREATE POLICY "Admin can view all orders" ON orders FOR SELECT USING (true);
 
--- Backwards-compatible migration: ensure featured column exists on existing databases
+-- Backwards-compatible migrations for existing databases
 ALTER TABLE products
   ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE;
+
+-- Visitor Analytics: create visits table if missing (run this if analytics show zeros)
+CREATE TABLE IF NOT EXISTS visits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  visited_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  page_url TEXT NOT NULL,
+  user_agent TEXT,
+  ip_address TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_visits_visited_at ON visits(visited_at DESC);
+CREATE INDEX IF NOT EXISTS idx_visits_page_url ON visits(page_url);
+ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
 

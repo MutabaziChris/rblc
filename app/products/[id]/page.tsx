@@ -1,11 +1,11 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { Product } from '@/types';
 import { getWhatsAppLink } from '@/lib/whatsappLink';
 import { CheckCircle, AlertCircle, XCircle } from 'lucide-react';
 import AIChatBox from '@/components/AIChatBox';
+import ProductImageGallery from '@/components/ProductImageGallery';
 
 // Force dynamic rendering so product details are always fresh
 export const dynamic = 'force-dynamic';
@@ -47,27 +47,19 @@ export default async function ProductDetailPage({
   const whatsappMessage = `Hello, I want to order ${product.name} for my ${product.car_brand} ${product.car_model}`;
   const whatsappLink = getWhatsAppLink(whatsappMessage);
 
-  // Same placeholder as cards for consistency
-  const placeholderUrl =
-    'https://images.pexels.com/photos/4489733/pexels-photo-4489733.jpeg?auto=compress&cs=tinysrgb&w=1200';
-
-  const imageSrc = product.image_url || placeholderUrl;
+  const images =
+    (product.image_urls && product.image_urls.length > 0)
+      ? product.image_urls
+      : product.image_url
+        ? [product.image_url]
+        : [];
 
   return (
     <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Product Image */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="relative h-96 bg-gray-200">
-              <Image
-                src={imageSrc}
-                alt={product.name}
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
+          {/* Product Image Gallery */}
+          <ProductImageGallery images={images} alt={product.name} />
 
           {/* Product Details */}
           <div className="space-y-6">

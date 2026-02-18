@@ -11,15 +11,14 @@ For development, you can use placeholder image services like:
 
 ## Production Setup
 
-For production, upload product images to:
-1. **Supabase Storage** (recommended)
-   - Create a `products` bucket in Supabase Storage
-   - Upload images and get public URLs
-   - Update `image_url` field in products table
+### Supabase Storage (recommended - used by admin panel)
 
-2. **Cloudinary** or **AWS S3**
-   - Upload images to your cloud storage
-   - Use CDN URLs for fast loading
+1. In **Supabase Dashboard** → **Storage** → **New bucket**
+2. Create a bucket named **`products`**
+3. Set it to **Public** (so product images are viewable)
+4. The admin panel can now upload images when adding/editing products
+
+You can also paste image URLs (from any source) instead of uploading.
 
 ## Image Guidelines
 

@@ -11,20 +11,24 @@ export async function POST(request: NextRequest) {
     const supabase = createServerClient();
     const productData = await request.json();
 
+    const insertPayload: Record<string, unknown> = {
+      name: productData.name,
+      category: productData.category,
+      price: productData.price,
+      car_brand: productData.car_brand,
+      car_model: productData.car_model,
+      stock_status: productData.stock_status,
+      supplier_id: productData.supplier_id,
+      description: productData.description,
+      image_url: productData.image_url ?? null,
+      featured: productData.featured ?? false,
+    };
+    if (Array.isArray(productData.image_urls) && productData.image_urls.length > 0) {
+      insertPayload.image_urls = productData.image_urls;
+    }
     const { data: product, error } = await supabase
       .from('products')
-      .insert({
-        name: productData.name,
-        category: productData.category,
-        price: productData.price,
-        car_brand: productData.car_brand,
-        car_model: productData.car_model,
-        stock_status: productData.stock_status,
-        supplier_id: productData.supplier_id,
-        description: productData.description,
-        image_url: productData.image_url,
-        featured: productData.featured ?? false,
-      })
+      .insert(insertPayload)
       .select()
       .single();
 

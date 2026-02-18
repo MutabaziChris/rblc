@@ -14,13 +14,18 @@ export async function PUT(
   try {
     const supabase = createServerClient();
     const updates = await request.json();
+    const { image_urls, ...rest } = updates;
+    const updatePayload: Record<string, unknown> = {
+      ...rest,
+      updated_at: new Date().toISOString(),
+    };
+    if (image_urls !== undefined) {
+      updatePayload.image_urls = Array.isArray(image_urls) ? image_urls : null;
+    }
 
     const { data: product, error } = await supabase
       .from('products')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq('id', params.id)
       .select()
       .single();

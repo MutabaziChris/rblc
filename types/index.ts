@@ -8,6 +8,8 @@ export interface Product {
   stock_status: 'in_stock' | 'out_of_stock' | 'low_stock';
   supplier_id: string;
   image_url: string | null;
+  /** Array of image URLs for gallery; first is primary. Backward compatible with image_url. */
+  image_urls?: string[] | null;
   description?: string;
   created_at?: string;
   updated_at?: string;

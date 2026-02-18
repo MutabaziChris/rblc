@@ -1,5 +1,7 @@
 # Visitor Analytics Setup
 
+If your analytics dashboard shows **all zeros** despite visitors, the `visits` table is likely missing.
+
 ## 1. Create the `visits` table in Supabase
 
 1. Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project

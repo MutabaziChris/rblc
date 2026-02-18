@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Product, Supplier } from '@/types';
-import { Plus, Edit, Trash2, Package, Star } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Edit, Trash2, Package, Star, Upload, Link as LinkIcon, X } from 'lucide-react';
+import Image from 'next/image';
 
 /**
  * Admin Products Management Page
@@ -21,12 +21,15 @@ export default function AdminProductsPage() {
     price: '',
     car_brand: '',
     car_model: '',
-    stock_status: 'in_stock',
+    stock_status: 'in_stock' as const,
     supplier_id: '',
     description: '',
-    image_url: '',
+    image_urls: [] as string[],
     featured: false,
   });
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -63,11 +66,16 @@ export default function AdminProductsPage() {
         : '/api/admin/products';
       const method = editingProduct ? 'PUT' : 'POST';
 
+      const image_url = formData.image_urls[0] || null;
+      const image_urls = formData.image_urls.length ? formData.image_urls : null;
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          image_url,
+          image_urls,
           price: parseFloat(formData.price),
           featured: !!formData.featured,
         }),
@@ -78,8 +86,8 @@ export default function AdminProductsPage() {
         resetForm();
         alert(editingProduct ? 'Product updated!' : 'Product created!');
       } else {
-        const error = await response.json();
-        alert(`Error: ${error.message}`);
+        const err = await response.json();
+        alert(`Error: ${err.error || err.message || 'Unknown error'}`);
       }
     } catch (error) {
       alert('An error occurred');
@@ -88,6 +96,12 @@ export default function AdminProductsPage() {
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
+    const urls =
+      (product.image_urls && product.image_urls.length > 0)
+        ? product.image_urls
+        : product.image_url
+          ? [product.image_url]
+          : [];
     setFormData({
       name: product.name,
       category: product.category,
@@ -97,9 +111,10 @@ export default function AdminProductsPage() {
       stock_status: product.stock_status,
       supplier_id: product.supplier_id,
       description: product.description || '',
-      image_url: product.image_url || '',
+      image_urls: urls,
       featured: !!product.featured,
     });
+    setImageUrlInput('');
     setShowForm(true);
   };
 
@@ -132,11 +147,56 @@ export default function AdminProductsPage() {
       stock_status: 'in_stock',
       supplier_id: '',
       description: '',
-      image_url: '',
+      image_urls: [],
       featured: false,
     });
+    setImageUrlInput('');
     setEditingProduct(null);
     setShowForm(false);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
+    setUploading(true);
+    try {
+      const formDataUpload = new FormData();
+      Array.from(files).forEach((f) => formDataUpload.append('files', f));
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formDataUpload,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      setFormData((prev) => ({
+        ...prev,
+        image_urls: [...prev.image_urls, ...data.urls],
+      }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const addUrl = () => {
+    const url = imageUrlInput.trim();
+    if (!url) return;
+    try {
+      new URL(url);
+      setFormData((prev) => ({ ...prev, image_urls: [...prev.image_urls, url] }));
+      setImageUrlInput('');
+    } catch {
+      alert('Please enter a valid URL');
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      image_urls: prev.image_urls.filter((_, i) => i !== index),
+    }));
   };
 
   if (loading) {
@@ -283,17 +343,78 @@ export default function AdminProductsPage() {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Image URL
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Product Images (upload or paste URL)
                   </label>
-                  <input
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
+                  <div className="flex flex-wrap gap-3 mb-3">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      multiple
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm font-medium text-gray-700 disabled:opacity-50"
+                    >
+                      <Upload size={18} />
+                      {uploading ? 'Uploading...' : 'Upload photos'}
+                    </button>
+                    <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                      <input
+                        type="url"
+                        value={imageUrlInput}
+                        onChange={(e) => setImageUrlInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addUrl())}
+                        placeholder="Or paste image URL"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={addUrl}
+                        className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-md text-sm"
+                        title="Add URL"
+                      >
+                        <LinkIcon size={18} />
+                      </button>
+                    </div>
+                  </div>
+                  {formData.image_urls.length > 0 && (
+                    <div className="flex flex-wrap gap-3">
+                      {formData.image_urls.map((url, i) => (
+                        <div
+                          key={`${url}-${i}`}
+                          className="relative group w-20 h-20 rounded-lg overflow-hidden border border-gray-200 bg-gray-100"
+                        >
+                          <Image
+                            src={url}
+                            alt={`Preview ${i + 1}`}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(i)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Remove"
+                          >
+                            <X size={14} />
+                          </button>
+                          {i === 0 && (
+                            <span className="absolute bottom-1 left-1 px-2 py-0.5 bg-primary-600 text-white text-xs rounded">
+                              Primary
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center space-x-2 mt-6">
                   <input
