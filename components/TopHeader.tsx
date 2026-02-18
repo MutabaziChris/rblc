@@ -37,24 +37,24 @@ const socialLinks = [
 
 export default function TopHeader() {
   return (
-    <div className="bg-[#00a8f3]">
+    <div className="bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap justify-end items-center gap-3 sm:gap-5 h-8 py-1.5 text-xs sm:text-sm">
           <a
             href={`mailto:${EMAIL}`}
-            className="flex items-center gap-1.5 text-white hover:text-white/90 transition-colors"
+            className="flex items-center gap-1.5 text-slate-200 hover:text-white transition-colors"
           >
             <Mail size={13} className="shrink-0" />
             <span className="truncate">{EMAIL}</span>
           </a>
           <a
             href={`tel:${PHONE.replace(/\s/g, '')}`}
-            className="flex items-center gap-1.5 text-white hover:text-white/90 transition-colors"
+            className="flex items-center gap-1.5 text-slate-200 hover:text-white transition-colors"
           >
             <Phone size={13} className="shrink-0" />
             <span>{PHONE}</span>
           </a>
-          <span className="w-px h-4 bg-white/40 shrink-0" aria-hidden />
+          <span className="w-px h-4 bg-slate-600 shrink-0" aria-hidden />
           <nav className="flex items-center gap-2.5" aria-label="Social media">
             {socialLinks.map(({ href, icon: Icon, label, color }) => (
               <Link
