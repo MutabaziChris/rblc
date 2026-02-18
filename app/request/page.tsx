@@ -65,7 +65,7 @@ export default function RequestPartPage() {
             </div>
             <h1 className="text-3xl font-bold mb-2">Request a Part</h1>
             <p className="text-gray-600">
-              Can't find what you're looking for? Submit a request and we'll find it for you
+              Can&apos;t find what you&apos;re looking for? Submit a request and we&apos;ll find it for you
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FAQ } from '@/types';
 import { Plus, Edit, Trash2, HelpCircle } from 'lucide-react';
 
@@ -19,11 +19,7 @@ export default function AdminFAQsPage() {
     category: '',
   });
 
-  useEffect(() => {
-    fetchFAQs();
-  }, []);
-
-  const fetchFAQs = async () => {
+  const fetchFAQs = useCallback(async () => {
     try {
       const response = await fetch('/api/faqs');
       const data = await response.json();
@@ -33,7 +29,11 @@ export default function AdminFAQsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchFAQs();
+  }, [fetchFAQs]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

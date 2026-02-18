@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Mechanic } from '@/types';
 import { Plus, Edit, Trash2, Wrench } from 'lucide-react';
 
@@ -22,11 +22,7 @@ export default function AdminMechanicsPage() {
     email: '',
   });
 
-  useEffect(() => {
-    fetchMechanics();
-  }, []);
-
-  const fetchMechanics = async () => {
+  const fetchMechanics = useCallback(async () => {
     try {
       const response = await fetch('/api/mechanics');
       const data = await response.json();
@@ -36,7 +32,11 @@ export default function AdminMechanicsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchMechanics();
+  }, [fetchMechanics]);
 
   const generateReferralCode = (name: string): string => {
     const initials = name

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Supplier } from '@/types';
 import { Plus, Edit, Trash2, Users } from 'lucide-react';
 
@@ -22,11 +22,7 @@ export default function AdminSuppliersPage() {
     email: '',
   });
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, []);
-
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     try {
       const response = await fetch('/api/suppliers');
       const data = await response.json();
@@ -36,7 +32,11 @@ export default function AdminSuppliersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchSuppliers();
+  }, [fetchSuppliers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

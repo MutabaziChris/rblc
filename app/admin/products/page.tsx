@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Product, Supplier } from '@/types';
 import { Plus, Edit, Trash2, Package, Star } from 'lucide-react';
 import Link from 'next/link';
@@ -28,13 +28,7 @@ export default function AdminProductsPage() {
     featured: false,
   });
 
-  // Fetch products and suppliers on component mount
-  useEffect(() => {
-    fetchProducts();
-    fetchSuppliers();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await fetch('/api/products');
       const data = await response.json();
@@ -44,9 +38,9 @@ export default function AdminProductsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = useCallback(async () => {
     try {
       const response = await fetch('/api/suppliers');
       const data = await response.json();
@@ -54,7 +48,12 @@ export default function AdminProductsPage() {
     } catch (error) {
       console.error('Error fetching suppliers:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchSuppliers();
+  }, [fetchProducts, fetchSuppliers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
