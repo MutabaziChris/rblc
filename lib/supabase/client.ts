@@ -1,0 +1,12 @@
+/**
+ * Supabase Browser Client - for Client Components
+ * Used for login, signup, and client-side auth operations
+ */
+import { createBrowserClient } from '@supabase/ssr';
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
