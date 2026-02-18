@@ -11,6 +11,7 @@ import {
   Users,
   Wrench,
   HelpCircle,
+  BarChart3,
   LogOut,
   ChevronDown,
 } from 'lucide-react';
@@ -33,6 +34,7 @@ export default function AdminNav({ user }: AdminNavProps) {
 
   const navLinks = [
     { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
     { href: '/admin/products', label: 'Products', icon: Package },
     { href: '/admin/suppliers', label: 'Suppliers', icon: Users },

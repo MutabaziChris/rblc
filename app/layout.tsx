@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import ConditionalLayout from '@/components/ConditionalLayout';
 import AutoLogout from '@/components/AutoLogout';
+import VisitorTracker from '@/components/VisitorTracker';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AutoLogout />
+        <VisitorTracker />
         <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
