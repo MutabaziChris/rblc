@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
+import ProductsFilter from '@/components/ProductsFilter';
 import { supabase } from '@/lib/supabaseClient';
 import { Product } from '@/types';
-import { Search } from 'lucide-react';
 
 // Force dynamic rendering so listing always reflects latest products
 export const dynamic = 'force-dynamic';
@@ -99,80 +99,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold mb-8">All Products</h1>
 
-        {/* Filters - GET form so search + category + brand apply via URL */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <form action="/products" method="GET" className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-                Search
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                <input
-                  id="search"
-                  name="search"
-                  type="text"
-                  placeholder="Search products..."
-                  defaultValue={params.search ?? ''}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
-              <select
-                id="category"
-                name="category"
-                defaultValue={resolvedCategory}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="brand" className="block text-sm font-medium text-gray-700 mb-2">
-                Car Brand
-              </label>
-              <select
-                id="brand"
-                name="brand"
-                defaultValue={params.brand ?? ''}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-              >
-                <option value="">All Brands</option>
-                {brands.map((brand) => (
-                  <option key={brand} value={brand}>
-                    {brand}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex items-end gap-2">
-              <button
-                type="submit"
-                className="flex-1 bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors"
-              >
-                Apply Filters
-              </button>
-              <a
-                href="/products"
-                className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-center text-sm font-medium text-gray-700"
-              >
-                Clear
-              </a>
-            </div>
-          </form>
-        </div>
+        {/* Filters - auto-apply on change (search debounced 400ms) */}
+        <Suspense fallback={<div className="bg-white rounded-lg shadow-md p-6 mb-8 animate-pulse h-24" />}>
+          <ProductsFilter
+          categories={categories}
+          brands={brands}
+          initialSearch={params.search ?? ''}
+          initialCategory={resolvedCategory}
+          initialBrand={params.brand ?? ''}
+          />
+        </Suspense>
 
         {/* Products Grid */}
         {products.length === 0 ? (
