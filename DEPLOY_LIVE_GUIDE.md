@@ -54,7 +54,17 @@ Deploy with **Vercel** – no AOS server, no SSH, no manual builds. Push to GitH
 
 ## Updating Your Live Site (Every Time You Make Changes)
 
-### Option A: Double-Click the Script
+### Option A: Auto-push (recommended)
+
+1. Open a terminal in your project folder
+2. Run: `npm run watch-push`
+3. Leave it running while you work
+4. Every time you save a file, it will commit and push after 15 seconds
+5. Vercel deploys automatically
+
+See **AUTO_PUSH_README.md** for full details.
+
+### Option B: Double-Click the Script
 
 1. Double-click **`push-to-github.bat`** in your project folder
 2. Press Enter when asked for a commit message
@@ -62,7 +72,7 @@ Deploy with **Vercel** – no AOS server, no SSH, no manual builds. Push to GitH
 
 Vercel will detect the push and deploy automatically.
 
-### Option B: Use the Terminal
+### Option C: Use the Terminal
 
 1. Open a terminal in your project folder  
    (File Explorer → `C:\Users\user\Downloads\autoconnect` → type `cmd` in address bar)
