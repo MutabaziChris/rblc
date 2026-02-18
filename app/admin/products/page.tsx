@@ -15,16 +15,27 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    category: string;
+    price: string;
+    car_brand: string;
+    car_model: string;
+    stock_status: Product['stock_status'];
+    supplier_id: string;
+    description: string;
+    image_urls: string[];
+    featured: boolean;
+  }>({
     name: '',
     category: '',
     price: '',
     car_brand: '',
     car_model: '',
-    stock_status: 'in_stock' as const,
+    stock_status: 'in_stock',
     supplier_id: '',
     description: '',
-    image_urls: [] as string[],
+    image_urls: [],
     featured: false,
   });
   const [imageUrlInput, setImageUrlInput] = useState('');
