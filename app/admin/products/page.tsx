@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Product, Supplier } from '@/types';
-import { Plus, Edit, Trash2, Package, Star, Upload, Link as LinkIcon, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Star, Upload, Link as LinkIcon, X, Search } from 'lucide-react';
 import Image from 'next/image';
 
 /**
@@ -40,7 +40,19 @@ export default function AdminProductsPage() {
   });
   const [imageUrlInput, setImageUrlInput] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const filteredProducts = products.filter((p) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      p.car_brand.toLowerCase().includes(q) ||
+      p.car_model.toLowerCase().includes(q)
+    );
+  });
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -472,6 +484,26 @@ export default function AdminProductsPage() {
           </div>
         )}
 
+        {/* Search */}
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by name, category, car brand or model..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <p className="text-sm text-gray-600">
+            {filteredProducts.length} of {products.length} products
+          </p>
+        </div>
+
         {/* Products Table */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
@@ -502,7 +534,14 @@ export default function AdminProductsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {products.map((product) => (
+                {filteredProducts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                      {searchQuery ? 'No products match your search.' : 'No products yet.'}
+                    </td>
+                  </tr>
+                ) : (
+                filteredProducts.map((product) => (
                   <tr key={product.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm font-medium">{product.name}</td>
                     <td className="px-4 py-3 text-sm text-gray-600 capitalize">
@@ -579,7 +618,8 @@ export default function AdminProductsPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                ))
+                )}
               </tbody>
             </table>
           </div>
