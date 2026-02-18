@@ -1,9 +1,14 @@
 import OpenAI from 'openai';
 import { FAQ } from '@/types';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+/** Lazy-initialized to avoid build failure when OPENAI_API_KEY is not set */
+function getOpenAIClient(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is not configured');
+  }
+  return new OpenAI({ apiKey });
+}
 
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -16,6 +21,7 @@ export async function getAIResponse(
   faqs: FAQ[] = []
 ): Promise<{ response: string; escalated: boolean }> {
   try {
+    const openai = getOpenAIClient();
     const systemPrompt = `You are a helpful AI assistant for RBLC ltd, a car spare parts marketplace in Rwanda. 
 Your role is to:
 1. Answer customer inquiries about car parts
@@ -65,6 +71,7 @@ export async function suggestRelatedParts(
   requestedPart: string
 ): Promise<string[]> {
   try {
+    const openai = getOpenAIClient();
     const prompt = `Given a car: ${carBrand} ${carModel}, and a requested part: ${requestedPart}, 
 suggest 3-5 related parts that customers often need together or as alternatives. 
 Return only a JSON array of part names, no other text.`;
