@@ -127,6 +127,3 @@ export default async function ProductDetailPage({
     </div>
   );
 }
-
-// Ensure this page is always rendered dynamically (no static cache)
-export const dynamic = 'force-dynamic';
