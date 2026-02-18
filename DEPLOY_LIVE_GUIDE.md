@@ -1,215 +1,136 @@
-# 🚀 Deploy Your Website Live – Step-by-Step Guide (Beginner)
+# 🚀 Deploy Your Website Live – Vercel (No Server Needed)
 
-This guide will help you put all your recent changes (image upload, analytics, Google tag) online.
-
----
-
-## Before You Start
-
-- **This folder must be your project:** `c:\Users\user\Downloads\autoconnect`
-- **You need:** Git installed, GitHub account, AOS server access
+Deploy with **Vercel** – no AOS server, no SSH, no manual builds. Push to GitHub and your site updates automatically.
 
 ---
 
-# Part 1: On Your Computer (Windows)
+## How It Works
 
-## Step 1.1: Open the Project Folder in Terminal
-
-1. Open **File Explorer** and go to: `C:\Users\user\Downloads\autoconnect`
-2. Click the **address bar** at the top
-3. Type `cmd` and press **Enter** (a black terminal window opens in this folder)
-
-OR in Cursor/VS Code: press **Ctrl+`** (backtick) to open the terminal.
+1. You push code to **GitHub**
+2. **Vercel** (connected to your GitHub) automatically builds and deploys
+3. Your site is live at `https://your-project.vercel.app` (or your custom domain)
 
 ---
 
-## Step 1.2: Check if Git is Installed
+## One-Time Setup (If Not Done Yet)
 
-Type this and press Enter:
+### Step 1: Create a Vercel Account
 
-```
-git --version
-```
+1. Go to [vercel.com](https://vercel.com)
+2. Click **Sign Up**
+3. Choose **Continue with GitHub** (recommended)
 
-- If you see a version (e.g. `git version 2.43.0`) → continue
-- If you see "not recognized" → [Download Git](https://git-scm.com/download/win) and install it, then restart the terminal
+### Step 2: Import Your Project
+
+1. Go to [vercel.com/new](https://vercel.com/new)
+2. Click **Import Git Repository**
+3. Select your GitHub repository (e.g. `autoconnect` or `rblc`)
+4. Click **Import**
+
+### Step 3: Add Environment Variables
+
+**Before** clicking Deploy, add your variables:
+
+1. Expand **Environment Variables**
+2. Add each from your `.env.local`:
+
+| Variable | Where to get it |
+|----------|-----------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API |
+| `OPENAI_API_KEY` | OpenAI dashboard (if using AI chat) |
+| `NEXT_PUBLIC_APP_URL` | Your live URL, e.g. `https://your-project.vercel.app` |
+
+3. Add for **Production**, **Preview**, and **Development**
+
+### Step 4: Deploy
+
+1. Click **Deploy**
+2. Wait 2–5 minutes
+3. Your site is live
 
 ---
 
-## Step 1.3: Connect This Folder to GitHub (If Needed)
+## Updating Your Live Site (Every Time You Make Changes)
 
-If this folder is **not yet** connected to GitHub:
+### Option A: Double-Click the Script
 
-```
-git init
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-```
+1. Double-click **`push-to-github.bat`** in your project folder
+2. Press Enter when asked for a commit message
+3. Wait for the push to finish
 
-Replace `YOUR_USERNAME` and `YOUR_REPO` with your actual GitHub username and repo name (e.g. `MutabaziChris/rblc`).
+Vercel will detect the push and deploy automatically.
 
-To check if already connected:
+### Option B: Use the Terminal
 
-```
-git remote -v
-```
-
-If you see a GitHub URL, you're good.
-
----
-
-## Step 1.4: Save All Your Changes to Git
-
-Run these commands **one at a time**:
+1. Open a terminal in your project folder  
+   (File Explorer → `C:\Users\user\Downloads\autoconnect` → type `cmd` in address bar)
+2. Run:
 
 ```bash
 git add .
-```
-
-```bash
-git status
-```
-
-You should see a list of changed files (admin/products, upload API, etc.).
-
-```bash
-git commit -m "Image upload, analytics, Google tag, product fixes"
-```
-
-```bash
+git commit -m "Your update message"
 git push origin main
 ```
 
-- If it says `main` branch doesn't exist, try: `git push origin master`
-- If it asks for username/password, use your **GitHub username** and a **Personal Access Token** (not your normal password). Create one: GitHub → Settings → Developer settings → Personal access tokens.
+*(Use `master` instead of `main` if that's your branch)*
 
 ---
 
-## Step 1.5: Confirm the Push Succeeded
+## Check Your Deployment
 
-- Go to your GitHub repo in the browser
-- Check that the latest files (e.g. `app/api/admin/upload`, updated `app/admin/products/page.tsx`) are there
-- Note the latest commit message and time
-
----
-
-# Part 2: On Your AOS Server (Linux)
-
-## Step 2.1: Connect to Your Server via SSH
-
-1. Open a terminal (cmd, PowerShell, or PuTTY)
-2. Run (replace with your actual server details from AOS):
-
-```bash
-ssh root@YOUR_SERVER_IP
-```
-
-or
-
-```bash
-ssh YOUR_USERNAME@YOUR_SERVER_IP
-```
-
-3. Enter the password when prompted
+1. Go to [vercel.com/dashboard](https://vercel.com/dashboard)
+2. Open your project
+3. You'll see:
+   - **Deployments** – each push creates a new deployment
+   - **Visit** – open your live site
+   - **Logs** – build output if something fails
 
 ---
 
-## Step 2.2: Go to Your Project Folder
+## Custom Domain (Optional)
 
-Example (adjust path if yours is different):
-
-```bash
-cd /var/www/rblc
-```
-
-or
-
-```bash
-cd ~/rblc
-```
+1. In Vercel: Project → **Settings** → **Domains**
+2. Add your domain (e.g. `rblc.rw`)
+3. Follow the DNS instructions (add the records they give you at your domain registrar)
+4. Wait a few minutes to a few hours for DNS to propagate
 
 ---
 
-## Step 2.3: Pull the Latest Code from GitHub
+## Troubleshooting
 
-```bash
-git pull origin main
-```
+**Build fails on Vercel**  
+- Check **Deployments** → click the failed deployment → **Building** for the error
+- Common: missing env vars (add them in Project → Settings → Environment Variables)
 
-If your branch is `master`:
+**Site works locally but not on Vercel**  
+- Ensure all env vars from `.env.local` are added in Vercel
+- Set `NEXT_PUBLIC_APP_URL` to your Vercel URL (e.g. `https://your-project.vercel.app`)
 
-```bash
-git pull origin master
-```
+**"Git not found"**  
+- Install from [git-scm.com/download/win](https://git-scm.com/download/win)
+- Restart the terminal after installing
 
-You should see something like: `Updating abc1234..def5678` and a list of changed files.
-
----
-
-## Step 2.4: Deploy (Build and Restart)
-
-Run:
-
-```bash
-bash deploy.sh
-```
-
-Or manually:
-
-```bash
-npm install
-npm run build
-pm2 restart rblc
-```
-
-Wait for `npm run build` to finish (can take 1–2 minutes).
+**Push asks for login**  
+- Use a [GitHub Personal Access Token](https://github.com/settings/tokens) instead of password
+- Or set up [GitHub CLI](https://cli.github.com/) for easier auth
 
 ---
 
-## Step 2.5: Check That the Site Is Running
+## Supabase Setup for New Features
 
-```bash
-pm2 status
-```
+If you added **image upload** and **analytics**, run these in Supabase Dashboard → SQL Editor:
 
-You should see `rblc` with status `online`.
+**1. Image uploads (products bucket)**  
+Create in Supabase → Storage → New bucket → name: `products` → Public: ON
 
-```bash
-pm2 logs rblc --lines 20
-```
-
-Check for errors. A successful startup shows no red error messages.
-
----
-
-# Part 3: Verify Features on the Live Site
-
-1. Open your website in a browser (e.g. `https://rblc.rw`)
-2. **Admin → Products:** Add or edit a product and try uploading an image
-3. **Admin → Analytics:** Visit the site a few times and refresh; numbers should increase
-4. **Google Analytics:** Confirm your GA4 property is receiving data
-
----
-
-# Part 4: Supabase Setup (For New Features)
-
-If image upload or analytics still fail, run these in **Supabase Dashboard → SQL Editor**:
-
-## 4.1: Image Upload Storage Bucket
-
-The code tries to create the bucket automatically. If it fails, create it manually:
-
-1. Supabase Dashboard → **Storage**
-2. **New bucket** → name: `products`
-3. Set **Public bucket** to ON
-
-## 4.2: Image URLs Column (Products)
-
+**2. Product image_urls column**
 ```sql
 ALTER TABLE products ADD COLUMN IF NOT EXISTS image_urls JSONB DEFAULT '[]'::jsonb;
 ```
 
-## 4.3: Visitor Analytics (Visits Table)
-
+**3. Visitor analytics (visits table)**
 ```sql
 CREATE TABLE IF NOT EXISTS visits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -220,44 +141,15 @@ CREATE TABLE IF NOT EXISTS visits (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_visits_visited_at ON visits(visited_at DESC);
-CREATE INDEX IF NOT EXISTS idx_visits_page_url ON visits(page_url);
-ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
 ```
 
 ---
 
-# Quick Reference
+## Summary
 
-| Step        | Where   | Command / Action                                      |
-|-------------|---------|--------------------------------------------------------|
-| Push code   | Your PC | `git add .` → `git commit -m "msg"` → `git push origin main` |
-| Pull & run  | Server  | `cd /var/www/rblc` → `git pull origin main` → `bash deploy.sh` |
+| What you do       | Where     | Result                    |
+|-------------------|-----------|---------------------------|
+| `git push`        | Your PC   | Code goes to GitHub       |
+| Auto              | Vercel    | New deployment goes live  |
 
----
-
-# Troubleshooting
-
-**"Git not found"**  
-Install Git from https://git-scm.com/download/win
-
-**"Permission denied" or "Authentication failed" on push**  
-Use a GitHub Personal Access Token instead of your password.
-
-**"Branch 'main' not found"**  
-Use `master` instead: `git push origin master`, `git pull origin master`
-
-**"deploy.sh: permission denied"**  
-Run: `chmod +x deploy.sh` then `bash deploy.sh`
-
-**"npm run build" fails on server**  
-Check Node version: `node -v` (should be 18+). Install/upgrade if needed.
-
-**Image upload fails**  
-Ensure the `products` bucket exists in Supabase Storage and is public.
-
-**Analytics shows zeros**  
-Run the `visits` table SQL above in Supabase.
-
----
-
-Good luck. If you hit a specific error, note the exact message and step for easier debugging.
+No server, no SSH, no `deploy.sh` – just push.

@@ -1,47 +1,47 @@
 @echo off
 echo ========================================
-echo   Pushing your changes to GitHub
+echo   Pushing to GitHub - Vercel will auto-deploy
 echo ========================================
 echo.
 
 cd /d "%~dp0"
 
-echo Step 1: Adding all files...
+echo Adding all files...
 git add .
 if errorlevel 1 (
-    echo ERROR: Git add failed. Is Git installed?
+    echo ERROR: Git not found or not in a repo. Install Git from git-scm.com
     pause
     exit /b 1
 )
 
 echo.
-echo Step 2: Showing what will be committed...
+echo What changed:
 git status
 
 echo.
-set /p commit_msg="Step 3: Enter commit message (or press Enter for default): "
-if "%commit_msg%"=="" set commit_msg=Update: image upload, analytics, Google tag
+set /p commit_msg="Commit message (Enter for default): "
+if "%commit_msg%"=="" set commit_msg=Update site
 
-echo Committing: %commit_msg%
+echo.
+echo Committing...
 git commit -m "%commit_msg%"
 if errorlevel 1 (
-    echo No changes to commit, or commit failed.
+    echo Nothing to commit - no changes, or commit failed.
     pause
     exit /b 1
 )
 
 echo.
-echo Step 4: Pushing to GitHub...
-git push origin main
+echo Pushing to GitHub...
+git push origin main 2>nul
 if errorlevel 1 (
-    echo Push failed. Trying 'master' branch...
+    echo Trying master branch...
     git push origin master
 )
 
 echo.
 echo ========================================
-echo   Done! Now go to your server and run:
-echo   git pull origin main
-echo   bash deploy.sh
+echo   Done. Vercel will deploy automatically.
+echo   Check vercel.com/dashboard for status.
 echo ========================================
 pause
